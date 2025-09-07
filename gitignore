@@ -1,0 +1,21 @@
+# Node / outils locaux
+node_modules/
+dist/
+.cache/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Éditeurs
+.vscode/
+.idea/
+
+# Environnements
+.env
+.env.local
+.env.*.local
+
+# (Optionnel) Ignorer la config Firebase si vous ne voulez pas la versionner
+# assets/js/firebase-config.js

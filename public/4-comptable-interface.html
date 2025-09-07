@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interface Comptable — MJ Créations</title>
+  <style>
+    :root{
+      --primary:#2563eb;
+      --primary-dark:#1e40af;
+      --secondary:#f97316;
+      --success:#10b981;
+      --danger:#ef4444;
+      --warning:#f59e0b;
+      --dark:#111827;
+      --muted:#6b7280;
+      --bg:#f3f4f6;
+      --white:#ffffff;
+      --radius:14px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--dark);}
+    .layout{display:grid;grid-template-columns:290px 1fr;min-height:100vh}
+    aside{background:var(--dark);color:#fff;padding:22px 16px;}
+    .brand{font-weight:800;color:#fff;display:flex;align-items:center;gap:10px;margin-bottom:14px}
+    .brand i{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));}
+    .version{font-size:.85rem;color:#9ca3af;margin-bottom:22px}
+    nav{display:grid;gap:8px}
+    .nav-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;margin-top:18px;margin-bottom:8px}
+    .nav-btn{display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;color:#e5e7eb;text-decoration:none;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);transition:.2s;cursor:pointer}
+    .nav-btn:hover,.nav-btn.active{background:rgba(37,99,235,.25);border-color:rgba(37,99,235,.5);color:#fff}
+    main{padding:26px;display:grid;gap:24px}
+    .card{background:#fff;border-radius:var(--radius);box-shadow:0 10px 20px rgba(0,0,0,.06);padding:22px}
+    .section{display:none}
+    .section.active{display:block;animation:fade .2s ease-in}
+    @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    .h1{font-size:1.8rem;font-weight:800;margin-bottom:6px}
+    .muted{color:var(--muted)}
+    .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:10px}
+    .kpi{background:#fff;border-radius:14px;padding:18px;border-left:6px solid var(--primary);box-shadow:0 4px 14px rgba(37,99,235,.08)}
+    .kpi h4{font-size:.95rem;color:#374151;margin-bottom:6px}
+    .kpi .v{font-weight:800;font-size:1.6rem}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .row-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:.95rem}
+    th{background:#f8fafc;color:#6b7280;font-weight:700}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+    input,select,textarea{padding:10px 12px;border:2px solid #e5e7eb;border-radius:10px;outline:none;transition:.2s;background:#fff}
+    input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+    .btn{padding:10px 14px;border-radius:10px;border:none;background:var(--primary);color:#fff;font-weight:700;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:8px}
+    .btn:hover{transform:translateY(-1px);background:var(--primary-dark)}
+    .btn.outline{background:transparent;color:var(--primary);border:2px solid var(--primary)}
+    .badge{padding:.25rem .55rem;border-radius:9999px;font-size:.75rem;font-weight:700;display:inline-block}
+    .badge.ok{background:rgba(16,185,129,.12);color:#065f46}
+    .badge.warn{background:rgba(245,158,11,.12);color:#7c2d12}
+    .badge.err{background:rgba(239,68,68,.12);color:#7f1d1d}
+    .grid{display:grid;gap:16px}
+    .right{justify-self:end}
+    .code{background:#0b1220;color:#d1d5db;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;padding:14px;border-radius:12px;overflow:auto}
+    @media (max-width:980px){.layout{grid-template-columns:1fr}aside{position:sticky;top:0;z-index:10}.row,.row-3{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <div class="brand"><i>€</i><div>MJ Créations — Compta</div></div>
+    <div class="version">Suite gestion & comptabilité v1.0</div>
+
+    <div class="nav-title">Navigation</div>
+    <a class="nav-btn active" data-target="dash">📊 Tableau de bord</a>
+    <a class="nav-btn" data-target="factures">🧾 Devis & Factures</a>
+    <a class="nav-btn" data-target="achats">📦 Achats & Dépenses</a>
+    <a class="nav-btn" data-target="banque">🏦 Banque & Rapprochement</a>
+    <a class="nav-btn" data-target="compta">📚 Comptabilité Générale</a>
+    <a class="nav-btn" data-target="tva">🧮 TVA (CA3/CA12)</a>
+    <a class="nav-btn" data-target="immo">🏗️ Immobilisations</a>
+    <a class="nav-btn" data-target="rapports">📈 Rapports</a>
+    <a class="nav-btn" data-target="admin">🔐 Administration</a>
+  </aside>
+
+  <main>
+    <!-- Dashboard -->
+    <section id="dash" class="section active">
+      <div class="card">
+        <div class="h1">Vue d'ensemble financière</div>
+        <div class="muted">Indicateurs temps réel (démo local)</div>
+        <div class="kpis">
+          <div class="kpi"><h4>CA (mois)</h4><div class="v" id="kpiCaMois">—</div><div class="muted">variation <span id="kpiCaVar">+0%</span></div></div>
+          <div class="kpi"><h4>Marge brute</h4><div class="v" id="kpiMarge">—</div><div class="muted">Cumul HT - Achats</div></div>
+          <div class="kpi"><h4>Trésorerie</h4><div class="v" id="kpiTresor">—</div><div class="muted">Banques - Découverts</div></div>
+          <div class="kpi"><h4>Encours clients</h4><div class="v" id="kpiEncours">—</div><div class="muted">Factures impayées</div></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="card">
+          <h3 style="margin-bottom:8px">Dernières factures</h3>
+          <table id="lastInvoices"><thead><tr><th>#</th><th>Client</th><th>Date</th><th>HT</th><th>TVA</th><th>TTC</th><th>Statut</th></tr></thead><tbody></tbody></table>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:8px">Rapprochements récents</h3>
+          <table id="lastMatches"><thead><tr><th>Date</th><th>Libellé</th><th>Montant</th><th>Match</th><th>Confiance</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Devis & Factures -->
+    <section id="factures" class="section">
+      <div class="card">
+        <div class="toolbar">
+          <button class="btn" onclick="ui.newInvoice()">➕ Nouvelle facture</button>
+          <button class="btn outline" onclick="ui.newQuote()">📝 Nouveau devis</button>
+          <input id="invSearch" placeholder="Rechercher… (client, n°, montant)" oninput="ui.searchInvoices(this.value)" />
+        </div>
+        <table id="invoiceTable">
+          <thead><tr><th>#</th><th>Client</th><th>Date</th><th>HT</th><th>TVA</th><th>TTC</th><th>Échéance</th><th>Statut</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:10px">Émission rapide</h3>
+        <div class="row">
+          <div class="grid">
+            <label>Client<input id="f_client" placeholder="Nom client"/></label>
+            <label>Date<input id="f_date" type="date"/></label>
+            <label>Échéance<input id="f_due" type="date"/></label>
+            <label>Remise (%)<input id="f_discount" type="number" min="0" max="100" value="0"/></label>
+          </div>
+          <div class="grid">
+            <label>Ligne (libellé)<input id="f_label" placeholder="Prestation / Produit"/></label>
+            <label>Qté<input id="f_qty" type="number" min="1" value="1"/></label>
+            <label>PU HT (€)<input id="f_pu" type="number" step="0.01" value="100"/></label>
+            <label>TVA<select id="f_vat"><option>0</option><option>2.1</option><option>5.5</option><option selected>10</option><option>20</option></select></label>
+          </div>
+        </div>
+        <div class="toolbar" style="margin-top:10px">
+          <button class="btn" onclick="actions.addLine()">➕ Ajouter ligne</button>
+          <button class="btn" onclick="actions.finalizeInvoice()">✅ Générer facture</button>
+          <button class="btn outline" onclick="exports.pdf()">🧾 Export PDF (placeholder)</button>
+        </div>
+        <div class="code" id="invoicePreview">// Aperçu JSON facture…</div>
+      </div>
+    </section>
+
+    <!-- Achats & Dépenses -->
+    <section id="achats" class="section">
+      <div class="card">
+        <div class="toolbar">
+          <button class="btn" onclick="ui.newPurchase()">➕ Nouvelle dépense</button>
+          <input id="purSearch" placeholder="Rechercher fournisseur, libellé…" oninput="ui.searchPurchases(this.value)"/>
+        </div>
+        <table id="purchaseTable">
+          <thead><tr><th>#</th><th>Fournisseur</th><th>Date</th><th>HT</th><th>TVA</th><th>TTC</th><th>Compta</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Banque & Rapprochement -->
+    <section id="banque" class="section">
+      <div class="card">
+        <div class="toolbar">
+          <input type="file" id="bankFile" accept=".csv,.ofx,.qif" />
+          <button class="btn" onclick="imports.bank()">⬆️ Import relevé</button>
+          <button class="btn outline" onclick="bank.autoMatch()">🔎 Rapprochement auto</button>
+        </div>
+        <table id="bankTable">
+          <thead><tr><th>Date</th><th>Libellé</th><th>Montant</th><th>Type</th><th>Match</th><th>Confiance</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Comptabilité Générale -->
+    <section id="compta" class="section">
+      <div class="card">
+        <div class="toolbar">
+          <button class="btn" onclick="exports.fec()">📤 Export FEC (CSV)</button>
+          <button class="btn outline" onclick="exports.ledger()">📥 Export Grand-livre</button>
+        </div>
+        <table id="ledgerTable">
+          <thead><tr><th>Journal</th><th>N°</th><th>Date</th><th>Compte</th><th>Libellé</th><th>Débit</th><th>Crédit</th><th>Aux.</th><th>Pièce</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TVA -->
+    <section id="tva" class="section">
+      <div class="card">
+        <div class="row">
+          <div class="grid">
+            <h3>Déclaration CA3 — synthèse</h3>
+            <div class="kpis">
+              <div class="kpi"><h4>TVA collectée</h4><div class="v" id="tvaCollecte">—</div></div>
+              <div class="kpi"><h4>TVA déductible</h4><div class="v" id="tvaDeductible">—</div></div>
+              <div class="kpi"><h4>TVA nette due</h4><div class="v" id="tvaDue">—</div></div>
+            </div>
+          </div>
+          <div class="grid right">
+            <button class="btn" onclick="vat.compute()">🔄 Recalculer</button>
+            <button class="btn outline" onclick="exports.ca3()">📄 Export brouillon CA3 (CSV)</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="card">
+            <h4 style="margin-bottom:8px">Ventes par taux</h4>
+            <table id="vatSales"><thead><tr><th>Taux</th><th>Base HT</th><th>TVA</th></tr></thead><tbody></tbody></table>
+          </div>
+          <div class="card">
+            <h4 style="margin-bottom:8px">Achats par taux</h4>
+            <table id="vatPurchases"><thead><tr><th>Taux</th><th>Base HT</th><th>TVA</th></tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Immobilisations -->
+    <section id="immo" class="section">
+      <div class="card">
+        <div class="toolbar">
+          <button class="btn" onclick="immo.new()">➕ Ajouter immobilisation</button>
+          <button class="btn outline" onclick="immo.runDep()">📆 Calcul amortissements (mensuel)</button>
+        </div>
+        <table id="assetTable">
+          <thead><tr><th>#</th><th>Libellé</th><th>Brut</th><th>Méthode</th><th>Durée (an)</th><th>Dépréciation</th><th>VNC</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Rapports -->
+    <section id="rapports" class="section">
+      <div class="card">
+        <div class="toolbar">
+          <button class="btn" onclick="reports.basic()">📊 Générer rapports (CSV)</button>
+        </div>
+        <div class="code" id="reportOut">// Sorties rapports…</div>
+      </div>
+    </section>
+
+    <!-- Administration -->
+    <section id="admin" class="section">
+      <div class="card">
+        <h3>Paramètres & Sécurité</h3>
+        <div class="row">
+          <div class="grid">
+            <label>Mode multi-sociétés<select id="multi" ><option value="0">Désactivé</option><option value="1">Activé</option></select></label>
+            <label>Exercice en cours<select id="fiscalYear"></select></label>
+            <label>2FA<select id="twofa"><option>Activée</option><option>Désactivée</option></select></label>
+          </div>
+          <div class="grid">
+            <label>SIREN<input id="siren" placeholder="Ex: 123 456 789"/></label>
+            <label>N° TVA<input id="vatnum" placeholder="FR.."/></label>
+            <label>IBAN (QR)<input id="iban" placeholder="FR76…"/></label>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+// ---- Minimal demo dataset (replace by API/Firebase later) -----------------
+const store = {
+  invoices: [
+    {num:"F2025-001", client:"Société DURAND", date:"2025-09-01", ht:4500, vat:450, ttc:4950, due:"2025-10-01", status:"payée"},
+    {num:"F2025-002", client:"Mme Martin", date:"2025-09-03", ht:1800, vat:180, ttc:1980, due:"2025-10-03", status:"envoyée"},
+    {num:"F2025-003", client:"SARL BREIZH", date:"2025-09-08", ht:6200, vat:620, ttc:6820, due:"2025-10-08", status:"en retard"}
+  ],
+  purchases: [
+    {num:"A2025-041", fournisseur:"BigMat", date:"2025-09-02", ht:1200, vat:240, ttc:1440, account:"601"},
+    {num:"A2025-042", fournisseur:"Point P", date:"2025-09-05", ht:780,  vat:156, ttc:936, account:"601"},
+    {num:"A2025-043", fournisseur:"Kiloutou", date:"2025-09-06", ht:200,  vat:40,  ttc:240, account:"613"}
+  ],
+  bank: [
+    {date:"2025-09-03", label:"VIR SEPA DURAND", amount:+4950, type:"crédit", match:"F2025-001", score:0.98},
+    {date:"2025-09-07", label:"CB KILOUTOU", amount:-240, type:"débit", match:"A2025-043", score:0.92},
+    {date:"2025-09-10", label:"VIR Mme MARTIN", amount:+1980, type:"crédit", match:"F2025-002", score:0.65}
+  ],
+  ledger: [],
+  assets: [
+    {id:"IM001", label:"Camion utilitaire", brut:28000, method:"linéaire", years:5, depr:0, vnc:28000},
+    {id:"IM002", label:"Tonne à eau", brut:3500, method:"linéaire", years:7, depr:0, vnc:3500}
+  ]
+};
+
+// Seed ledger with examples
+function seedLedger(){
+  let num = 1;
+  const push = (j, acc, label, debit, credit, aux="", piece="") => {
+    store.ledger.push({journal:j, num:num++, date:new Date().toISOString().slice(0,10), account:acc, label, debit, credit, aux, piece});
+  };
+  // Simple examples from demo data
+  store.invoices.forEach(inv=>{
+    push("VE", "411", "Facture " + inv.num + " " + inv.client, inv.ttc, 0, inv.client, inv.num);
+    push("VE", "707", "Vente", 0, inv.ht, "", inv.num);
+    push("VE", "44571","TVA collectée", 0, inv.vat, "", inv.num);
+  });
+  store.purchases.forEach(p=>{
+    push("AC", "6" + p.account, "Achat " + p.num + " " + p.fournisseur, p.ht, 0, p.fournisseur, p.num);
+    push("AC", "44566","TVA déductible", p.vat, 0, "", p.num);
+    push("AC", "401", "Fournisseur " + p.fournisseur, 0, p.ttc, p.fournisseur, p.num);
+  });
+}
+seedLedger();
+
+// ---- UI helpers -----------------------------------------------------------
+const € = (n) => new Intl.NumberFormat('fr-FR',{style:'currency', currency:'EUR'}).format(n);
+const el = (id) => document.getElementById(id);
+const qs = (s,root=document)=>root.querySelector(s);
+const qsa = (s,root=document)=>[...root.querySelectorAll(s)];
+
+// Navigation
+qsa(".nav-btn").forEach(b=>b.addEventListener("click", (e)=>{
+  qsa(".nav-btn").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  const target = b.dataset.target;
+  qsa(".section").forEach(s=>s.classList.remove("active"));
+  el(target).classList.add("active");
+}));
+
+// Populate dashboards
+function refresh(){
+  // KPIs
+  const caMois = store.invoices.reduce((s,i)=>s+i.ttc,0);
+  const marge = store.invoices.reduce((s,i)=>s+i.ht,0) - store.purchases.reduce((s,p)=>s+p.ht,0);
+  const tresor = store.bank.reduce((s,t)=>s+t.amount,0);
+  const encours = store.invoices.filter(i=>i.status!=="payée").reduce((s,i)=>s+i.ttc,0);
+  el("kpiCaMois").textContent = €(caMois);
+  el("kpiMarge").textContent  = €(marge);
+  el("kpiTresor").textContent = €(tresor);
+  el("kpiEncours").textContent= €(encours);
+
+  // Dernières factures
+  const lastI = el("lastInvoices").querySelector("tbody");
+  lastI.innerHTML = store.invoices.slice(-5).map(i=>`<tr>
+    <td>${i.num}</td><td>${i.client}</td><td>${i.date}</td>
+    <td>${€(i.ht)}</td><td>${€(i.vat)}</td><td>${€(i.ttc)}</td>
+    <td><span class="badge ${i.status==='payée'?'ok':(i.status==='en retard'?'err':'warn')}">${i.status}</span></td>
+  </tr>`).join("");
+
+  // Rapprochements récents
+  const lastM = el("lastMatches").querySelector("tbody");
+  lastM.innerHTML = store.bank.slice(-5).map(t=>`<tr>
+    <td>${t.date}</td><td>${t.label}</td><td>${€(t.amount)}</td><td>${t.type}</td>
+    <td>${t.match||'-'}</td><td>${Math.round(t.score*100)}%</td>
+  </tr>`).join("");
+
+  // Tables principales
+  ui.renderInvoices();
+  ui.renderPurchases();
+  ui.renderBank();
+  ui.renderLedger();
+  ui.renderAssets();
+  vat.compute();
+}
+document.addEventListener("DOMContentLoaded", refresh);
+
+// Invoices UI
+const ui = {
+  renderInvoices(){
+    const body = el("invoiceTable").querySelector("tbody");
+    body.innerHTML = store.invoices.map(i=>`<tr>
+    <td>${i.num}</td><td>${i.client}</td><td>${i.date}</td>
+    <td>${€(i.ht)}</td><td>${€(i.vat)}</td><td>${€(i.ttc)}</td>
+    <td>${i.due}</td><td>${i.status}</td>
+    <td><button class="btn outline" onclick="actions.send('${i.num}')">Envoyer</button></td>
+    </tr>`).join("");
+  },
+  searchInvoices(q){
+    q = (q||"").toLowerCase();
+    const body = el("invoiceTable").querySelector("tbody");
+    body.querySelectorAll("tr").forEach(tr=>{
+      tr.style.display = [...tr.children].some(td=>td.textContent.toLowerCase().includes(q)) ? "" : "none";
+    });
+  },
+  newInvoice(){ alert("Formulaire facture avancé à intégrer (PDF, signature, QR IBAN)."); },
+  newQuote(){ alert("Création de devis – conversion en facture avec numérotation continue."); },
+  renderPurchases(){
+    const body = el("purchaseTable").querySelector("tbody");
+    body.innerHTML = store.purchases.map(p=>`<tr>
+      <td>${p.num}</td><td>${p.fournisseur}</td><td>${p.date}</td>
+      <td>${€(p.ht)}</td><td>${€(p.vat)}</td><td>${€(p.ttc)}</td><td>${p.account}</td>
+    </tr>`).join("");
+  },
+  searchPurchases(q){
+    q = (q||"").toLowerCase();
+    const body = el("purchaseTable").querySelector("tbody");
+    body.querySelectorAll("tr").forEach(tr=>{
+      tr.style.display = [...tr.children].some(td=>td.textContent.toLowerCase().includes(q)) ? "" : "none";
+    });
+  },
+  renderBank(){
+    const body = el("bankTable").querySelector("tbody");
+    body.innerHTML = store.bank.map(t=>`<tr>
+      <td>${t.date}</td><td>${t.label}</td><td>${€(t.amount)}</td><td>${t.type}</td>
+      <td>${t.match||"-"}</td><td>${Math.round(t.score*100)}%</td>
+    </tr>`).join("");
+  },
+  renderLedger(){
+    const body = el("ledgerTable").querySelector("tbody");
+    body.innerHTML = store.ledger.map(l=>`<tr>
+      <td>${l.journal}</td><td>${l.num}</td><td>${l.date}</td><td>${l.account}</td>
+      <td>${l.label}</td><td>${€(l.debit)}</td><td>${€(l.credit)}</td><td>${l.aux}</td><td>${l.piece}</td>
+    </tr>`).join("");
+  },
+  renderAssets(){
+    const body = el("assetTable").querySelector("tbody");
+    body.innerHTML = store.assets.map(a=>`<tr>
+      <td>${a.id}</td><td>${a.label}</td><td>${€(a.brut)}</td><td>${a.method}</td><td>${a.years}</td>
+      <td>${€(a.depr)}</td><td>${€(a.vnc)}</td>
+    </tr>`).join("");
+  }
+};
+
+// Actions
+const actions = {
+  _draft: {lines:[]},
+  addLine(){
+    const q = Number(el("f_qty").value||"1");
+    const pu= Number(el("f_pu").value||"0");
+    const vat= Number(el("f_vat").value||"20");
+    const label = el("f_label").value||"Prestation";
+    actions._draft.lines.push({label,q,pu,vat});
+    el("invoicePreview").textContent = JSON.stringify(actions._draft,null,2);
+  },
+  finalizeInvoice(){
+    const client = el("f_client").value||"Client";
+    const date = el("f_date").value||new Date().toISOString().slice(0,10);
+    const due  = el("f_due").value||date;
+    const discount = Number(el("f_discount").value||"0");
+    const num = "F" + new Date().getFullYear() + "-" + String(100 + store.invoices.length+1).padStart(3,"0");
+    const sums = actions._draft.lines.reduce((s,l)=>{
+      const line = l.q * l.pu;
+      s.ht += line; s.vat += line*(l.vat/100); return s;
+    },{ht:0,vat:0});
+    sums.ht = sums.ht * (1 - discount/100);
+    const inv = {num, client, date, ht:round2(sums.ht), vat:round2(sums.vat), ttc:round2(sums.ht+sums.vat), due, status:"brouillon"};
+    store.invoices.push(inv);
+    actions._draft = {lines:[]};
+    ui.renderInvoices(); refresh();
+    alert("Facture générée (brouillon).");
+  },
+  send(num){ alert("Envoi email + pièce jointe PDF pour " + num + " (à intégrer)."); }
+};
+function round2(n){ return Math.round(n*100)/100; }
+
+// Bank
+const bank = {
+  autoMatch(){
+    // Simple matching demo using amount & label includes invoice number
+    store.bank.forEach(t=>{
+      const match = store.invoices.find(i => Math.abs(i.ttc - Math.abs(t.amount))<1 || t.label.includes(i.num));
+      if(match){ t.match = match.num; t.score = Math.max(t.score||0.6,0.85); }
+    });
+    ui.renderBank();
+    alert("Rapprochement automatique effectué (démo).");
+  }
+};
+
+// VAT
+const vat = {
+  compute(){
+    const group = (items, fieldVat, fieldBase="ht") => {
+      const m = new Map();
+      items.forEach(x=>{
+        const rate = typeof x[fieldVat]==="number"?x[fieldVat]:(x.vat|| (x[fieldVat]||0));
+        const base = x[fieldBase] ?? x.ht ?? 0;
+        const tax  = x.vat ?? base * (rate/100);
+        const key = rate.toString();
+        const prev = m.get(key) || {base:0,tax:0};
+        prev.base += base; prev.tax += tax; m.set(key,prev);
+      });
+      return [...m.entries()].map(([k,v])=>({rate:Number(k), base:round2(v.base), tax:round2(v.tax)})).sort((a,b)=>a.rate-b.rate);
+    };
+    const sales = group(store.invoices,"vat","ht");
+    const purchases = group(store.purchases,"vat","ht");
+    const totC = sales.reduce((s,r)=>s+r.tax,0);
+    const totD = purchases.reduce((s,r)=>s+r.tax,0);
+    el("tvaCollecte").textContent = €(totC);
+    el("tvaDeductible").textContent = €(totD);
+    el("tvaDue").textContent = €(round2(totC - totD));
+    const tb = el("vatSales").querySelector("tbody");
+    tb.innerHTML = sales.map(r=>`<tr><td>${r.rate}%</td><td>${€(r.base)}</td><td>${€(r.tax)}</td></tr>`).join("");
+    const tp = el("vatPurchases").querySelector("tbody");
+    tp.innerHTML = purchases.map(r=>`<tr><td>${r.rate}%</td><td>${€(r.base)}</td><td>${€(r.tax)}</td></tr>`).join("");
+  }
+};
+
+// Imports
+const imports = {
+  bank(){
+    const f = el("bankFile");
+    if(!f.files[0]) return alert("Sélectionnez un fichier CSV/OFX/QIF");
+    const reader = new FileReader();
+    reader.onload = () => {
+      const txt = reader.result;
+      // Minimal CSV reader "date;label;amount"
+      txt.split(/\r?\n/).slice(1).forEach(line=>{
+        const [d,l,a] = line.split(/[;,]/);
+        if(d && a){ store.bank.push({date:d.trim(), label:(l||"").trim(), amount:Number(a), type:Number(a)>=0?'crédit':'débit', score:0.5}); }
+      });
+      ui.renderBank();
+      alert("Relevé importé (démo CSV).");
+    };
+    reader.readAsText(f.files[0]);
+  }
+};
+
+// Exports
+const exports = {
+  csv(name, rows){
+    const content = rows.map(r=>Object.values(r).map(x=>String(x).replaceAll('"','""')).map(x=>`"${x}"`).join(";")).join("\n");
+    const blob = new Blob([content], {type:"text/csv;charset=utf-8;"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url);
+  },
+  fec(){
+    // Very simplified FEC CSV (DGFiP format is richer; here we include core columns for test)
+    const rows = store.ledger.map(l=>({
+      Journal:l.journal, EcritureNum:l.num, EcritureDate:l.date, CompteNum:l.account, CompAuxNum:l.aux||"", PieceRef:l.piece||"",
+      EcritureLib:l.label, Debit:l.debit, Credit:l.credit
+    }));
+    exports.csv("FEC_demo.csv", rows);
+  },
+  ledger(){
+    const rows = store.ledger.map(l=>({
+      Journal:l.journal, Num:l.num, Date:l.date, Compte:l.account, Libellé:l.label, Débit:l.debit, Crédit:l.credit, Aux:l.aux, Pièce:l.piece
+    }));
+    exports.csv("GrandLivre_demo.csv", rows);
+  },
+  ca3(){
+    const rows = [
+      {Code:"01", Libellé:"Ventes imposables 20%", Base: store.invoices.filter(i=>i.vat===20).reduce((s,i)=>s+i.ht,0)},
+      {Code:"02", Libellé:"Ventes imposables 10%", Base: store.invoices.filter(i=>i.vat===10).reduce((s,i)=>s+i.ht,0)},
+      {Code:"20", Libellé:"TVA collectée", Montant: store.invoices.reduce((s,i)=>s+i.vat,0)},
+      {Code:"50", Libellé:"TVA déductible", Montant: store.purchases.reduce((s,p)=>s+p.vat,0)},
+    ];
+    exports.csv("CA3_brouillon.csv", rows);
+  },
+  pdf(){
+    alert("Génération PDF à brancher (html2pdf / serveur).");
+  }
+};
+
+// Immobilisations
+const immo = {
+  new(){ alert("Formulaire création d'immobilisation (compte 215/213/218)."); },
+  runDep(){
+    // Linear monthly depreciation (illustrative)
+    store.assets.forEach(a=>{
+      const monthly = a.brut / (a.years * 12);
+      a.depr = round2(a.depr + monthly);
+      a.vnc = round2(a.brut - a.depr);
+    });
+    ui.renderAssets();
+    alert("Amortissements mensuels calculés (démo).");
+  }
+};
+
+// Reports
+const reports = {
+  basic(){
+    const out = {
+      ca_mensuel: store.invoices.reduce((s,i)=>s+i.ttc,0),
+      marge: store.invoices.reduce((s,i)=>s+i.ht,0) - store.purchases.reduce((s,p)=>s+p.ht,0),
+      tresorerie: store.bank.reduce((s,t)=>s+t.amount,0),
+      tva_due: store.invoices.reduce((s,i)=>s+i.vat,0) - store.purchases.reduce((s,p)=>s+p.vat,0)
+    };
+    el("reportOut").textContent = JSON.stringify(out,null,2);
+  }
+};
+
+// Populate fiscal years select
+(function(){
+  const sel = el("fiscalYear");
+  const y = new Date().getFullYear();
+  for(let i=y-1;i<=y+1;i++){ const o=document.createElement("option"); o.text=i; sel.add(o); }
+})();
+
+</script>
+</body>
+</html>
